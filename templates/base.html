@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<style>
+.resourceButton {
+	background-color:#516b57;
+	border-radius:28px;
+	border:1px solid #080808;
+  /* border:1px solid #747962; */
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:12px;
+	padding:16px 31px;
+	margin:0 0 30px 0;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #2f6627;
+}
+
+</style>
+<!-- <script type="text/javascript" charset="utf8" src="/static/jquery.dataTables.js"></script> -->
+<script type="text/javascript" charset="utf8" src="/static/jquery-3.5.1.js"></script>
+<script type="text/javascript" charset="utf8" src="/static/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf8" src="/static/dataTables.buttons.min.js"></script>
+<script type="text/javascript" charset="utf8" src="/static/jszip.min.js"></script>
+<!-- <script type="text/javascript" charset="utf8" src="static/pdfmake.min.js"></script> -->
+<script type="text/javascript" charset="utf8" src="/static/vfs_fonts.js"></script>
+<script type="text/javascript" charset="utf8" src="/static/buttons.html5.min.js"></script>
+<script type="text/javascript" charset="utf8" src="/static/buttons.print.min.js"></script>
+<script type="text/javascript" charset="utf8" src="/static/jquery.highlight.js"></script>
+<script type="text/javascript" charset="utf8" src="/static/dataTables.searchHighlight.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/datatables.min.css">
+<link rel="stylesheet" type="text/css" href="/static/dataTables.searchHighlight.css">
+<script type="text/javascript">
+
+function set_filters(table) {
+              // console.log(table)
+              table.columns('.select-filter')
+                .every(function () {
+                    var column = this;
+                    var select = $('<select><option value=""></option></select>')
+                        // .appendTo($(column.footer()).empty())
+                        .appendTo($(column.header()).empty())
+                        .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                            // console.log(val);
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    column
+                        .data()
+                        .unique()
+                        .sort()
+                        .each(function (d, j) {
+                            select.append('<option value="' + d + '">' + d + '</option>');
+                        });
+                });
+        };
+
+
+
+
+$(document).ready(function() {
+  $('table.display').each(function(i) {
+    var thisTable = $(this);
+    var table_header_value = thisTable.attr('dtype');
+    console.log(table_header_value);
+    var table = thisTable.DataTable({
+          dom: 'Bfrtip',
+          buttons: [
+            'copy', 'csv', 'excel', 'print'
+              ],
+          lengthMenu: [50,150,500,1000],
+          searchHighlight: true, 
+          orderCellsTop: true,
+          fixedHeader: true,
+          // "scrollX": "200px",
+          "scrollX": false,
+          "scrollCollapse": true,
+          "pageLength": 150,
+          ajax:{ 
+            timeout: 30000,
+            dataType: 'json',
+            contenType: 'application/json',
+            async:true,
+            url: '/ajax/',
+            dataSrc: 'rows',
+            data: function (d) {
+                      d.res = table_header_value;
+                  },
+              },
+
+    });
+    setTimeout(() => { 
+      set_filters(table)}, 1000);
+    setInterval( function () {
+    table.ajax.reload(); set_filters(table);
+      }, 60000 );
+    setInterval(() => {
+      set_filters(table);
+    }, 3000);
+    // console.log(table.columns('.select-filter'))
+    // set_filters(table);
+  })
+  
+  var all = document.querySelectorAll("[id=resourceButton]");
+  all[0].click(); 
+});
+
+function openTable(obj) {
+  var table = obj.getAttribute('btype');
+  var y = document.querySelector("[dtype="+table+"]");
+  var x = y.closest('#table_id_wrapper');
+  var all = document.querySelectorAll("[id=table_id_wrapper]");
+  var allButtons = document.querySelectorAll("[id=resourceButton]");
+  for (var i = 0, max = all.length; i < max; i++) {
+    all[i].style.display = "none";
+    allButtons[i].style.backgroundColor = '#747962'; 
+    }
+    obj.style.backgroundColor = '#516b57';
+    console.log(x,y)
+    x.style.display = "block";
+}
+
+
+
+</script>
+    <title>{% block title %} {% endblock %}</title>
+  </head>
+  <body>
+        {% block table %} {% endblock %}
+
+  </body>
+</html>

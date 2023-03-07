@@ -1,0 +1,8 @@
+FROM python:3.10
+COPY requirements.txt /
+RUN pip3 install -r requirements.txt 
+COPY ./templates /templates
+COPY ./static /static
+COPY web.py /
+EXPOSE 9999
+ENTRYPOINT [ "python3", "web.py" ] 

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block table %}
+
+{% for table in data %}
+<button class=resourceButton id=resourceButton btype={{ table }} onclick="openTable(this)">{{ table }}</button>
+{%endfor%}
+{% for table in data %}
+<table dtype={{ table }} id="table_id" class="display nowrap compact"  style="width:100%">
+
+<thead>
+<tr>
+    {% for c in data[table].columns %}
+    {%if ( c == 'location.region_name' or c == "status" or c == "hypervisor_type" or c == "hypervisor_version") %}
+    <th class="select-filter c">{{ c }}</th>
+    {%else%}
+    <th class="c">{{ c }}</th>
+    {%endif%}
+    {% endfor %}
+</tr>
+</thead>
+<!-- <tbody>
+{% for r in data[table].rows %}
+<tr>
+{% for row in r %}
+<td >{{ row }}</td>
+    {% endfor %}
+</tr>
+    {% endfor %}
+</tbody> -->
+<tfoot>
+<tr>
+    {% for c in data[table].columns %}
+    <th>{{ c }}</th>
+    {% endfor %}
+</tr>
+</tfoot>
+{% endfor %}
+
+
+{% endblock %}
